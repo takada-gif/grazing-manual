@@ -1,0 +1,1091 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>📊 経営分析ダッシュボード</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            font-weight: 300;
+        }
+
+        .header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+
+        .content {
+            padding: 30px;
+        }
+
+        .input-section {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 25px;
+            margin-bottom: 30px;
+            border-left: 5px solid #4facfe;
+        }
+
+        .input-section h2 {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 1.5em;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #555;
+        }
+
+        .input-group input, .input-group textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e1e5e9;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.3s ease;
+        }
+
+        .input-group input:focus, .input-group textarea:focus {
+            outline: none;
+            border-color: #4facfe;
+        }
+
+        .input-group textarea {
+            height: 120px;
+            resize: vertical;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 25px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            margin-right: 10px;
+            margin-bottom: 10px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(79, 172, 254, 0.3);
+        }
+
+        .btn.secondary {
+            background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+        }
+
+        .btn.success {
+            background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+        }
+
+        .btn.warning {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .summary-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .summary-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 25px;
+            border-radius: 15px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+
+        .summary-card h4 {
+            font-size: 0.9em;
+            opacity: 0.9;
+            margin-bottom: 10px;
+        }
+
+        .summary-card .value {
+            font-size: 2em;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .summary-card .change {
+            font-size: 0.9em;
+            opacity: 0.8;
+        }
+
+        .charts-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 30px;
+            margin-top: 30px;
+        }
+
+        .chart-card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            border: 1px solid #e1e5e9;
+        }
+
+        .chart-card h3 {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 1.3em;
+            text-align: center;
+        }
+
+        .chart-container {
+            position: relative;
+            height: 400px;
+        }
+
+        .alert-section {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+            display: none;
+        }
+
+        .alert-section h3 {
+            color: #856404;
+            margin-bottom: 15px;
+            font-size: 1.2em;
+        }
+
+        .alert-item {
+            background: white;
+            border-left: 4px solid #ff6b6b;
+            padding: 12px 15px;
+            margin: 10px 0;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .alert-item.warning {
+            border-left-color: #ffc107;
+        }
+
+        .alert-item.danger {
+            border-left-color: #dc3545;
+        }
+
+        .alert-item.success {
+            border-left-color: #28a745;
+        }
+
+        .alert-item h4 {
+            margin: 0 0 5px 0;
+            font-size: 1em;
+            color: #333;
+        }
+
+        .alert-item p {
+            margin: 0;
+            color: #666;
+            font-size: 0.9em;
+        }
+
+        .error {
+            background: #ff6b6b;
+            color: white;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+            display: none;
+        }
+
+        .success {
+            background: #51cf66;
+            color: white;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+            display: none;
+        }
+
+        @media (max-width: 768px) {
+            .charts-container {
+                grid-template-columns: 1fr;
+            }
+            
+            .summary-cards {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📊 経営分析ダッシュボード</h1>
+            <p>売上・利益・経費の包括的な分析と可視化</p>
+        </div>
+
+        <div class="content">
+            <!-- データ入力セクション -->
+            <div class="input-section">
+                <h2>📄 データ入力</h2>
+                
+                <!-- ファイルアップロード -->
+                <div class="input-group">
+                    <label for="csvFile">CSVファイルをアップロード：</label>
+                    <input type="file" id="csvFile" accept=".csv,.xlsx,.xls" onchange="DataProcessor.handleFileUpload(event)" style="padding: 8px; border: 2px solid #e1e5e9; border-radius: 8px; width: 100%;">
+                    <div id="fileInfo" style="margin-top: 10px; font-size: 0.9em; color: #666;"></div>
+                </div>
+                
+                <!-- テキスト入力 -->
+                <div class="input-group">
+                    <label for="dataInput">または、データをテキストで入力：</label>
+                    <textarea id="dataInput" placeholder="例：
+2025年6月: 単月実績 274,890,000円, 累計実績 766,174,000円, 利益 50,000,000円
+2025年7月: 単月実績 300,000,000円, 累計実績 1,066,174,000円, 利益 60,000,000円
+..."></textarea>
+                </div>
+                
+                <!-- ボタン群 -->
+                <button class="btn" onclick="Dashboard.processData()">📈 データを分析・可視化</button>
+                <button class="btn secondary" onclick="DataProcessor.loadSampleData()">🎯 サンプルデータで試す</button>
+                <button class="btn success" onclick="DataProcessor.loadCSVData()">📊 CSVデータで可視化</button>
+                <button class="btn warning" onclick="EmailService.shareByEmail()">📧 メールで共有</button>
+            </div>
+
+            <!-- メッセージ表示 -->
+            <div class="error" id="errorMessage"></div>
+            <div class="success" id="successMessage"></div>
+            <div class="alert-section" id="alertSection">
+                <h3>🚨 分析結果とアラート</h3>
+                <div id="alertContainer"></div>
+            </div>
+
+            <!-- サマリーカード -->
+            <div class="summary-cards" id="summaryCards" style="display: none;">
+                <div class="summary-card">
+                    <h4>総売上</h4>
+                    <div class="value" id="totalRevenue">¥0</div>
+                    <div class="change">累計</div>
+                </div>
+                <div class="summary-card">
+                    <h4>前月売上</h4>
+                    <div class="value" id="lastMonthRevenue">¥0</div>
+                    <div class="change">前月実績</div>
+                </div>
+                <div class="summary-card">
+                    <h4>前月累計売上</h4>
+                    <div class="value" id="lastMonthCumulative">¥0</div>
+                    <div class="change">前月までの累計</div>
+                </div>
+                <div class="summary-card">
+                    <h4>平均粗利率</h4>
+                    <div class="value" id="avgGrossMargin">0%</div>
+                    <div class="change">月平均</div>
+                </div>
+                <div class="summary-card">
+                    <h4>累計営業利益</h4>
+                    <div class="value" id="totalOperatingProfit">¥0</div>
+                    <div class="change">累計額</div>
+                </div>
+                <div class="summary-card">
+                    <h4>累計営業利益率</h4>
+                    <div class="value" id="totalOperatingMargin">0%</div>
+                    <div class="change">累計率</div>
+                </div>
+                <div class="summary-card">
+                    <h4>前月営業利益</h4>
+                    <div class="value" id="lastMonthOperatingProfit">¥0</div>
+                    <div class="change">前月実績</div>
+                </div>
+                <div class="summary-card">
+                    <h4>前月営業利益率</h4>
+                    <div class="value" id="lastMonthOperatingMargin">0%</div>
+                    <div class="change">前月率</div>
+                </div>
+            </div>
+
+            <!-- チャート表示エリア -->
+            <div class="charts-container" id="chartsContainer" style="display: none;">
+                <div class="chart-card">
+                    <h3>📈 月別売上推移</h3>
+                    <div class="chart-container">
+                        <canvas id="revenueChart"></canvas>
+                    </div>
+                </div>
+                <div class="chart-card">
+                    <h3>💰 月別利益率推移</h3>
+                    <div class="chart-container">
+                        <canvas id="marginChart"></canvas>
+                    </div>
+                </div>
+                <div class="chart-card">
+                    <h3>📊 売上 vs 予算</h3>
+                    <div class="chart-container">
+                        <canvas id="budgetChart"></canvas>
+                    </div>
+                </div>
+                <div class="chart-card">
+                    <h3>🎯 予算達成率</h3>
+                    <div class="chart-container">
+                        <canvas id="achievementChart"></canvas>
+                    </div>
+                </div>
+                <div class="chart-card">
+                    <h3>💸 トップ5経費推移</h3>
+                    <div class="chart-container">
+                        <canvas id="expenseChart"></canvas>
+                    </div>
+                </div>
+                <div class="chart-card">
+                    <h3>📊 経費構成比</h3>
+                    <div class="chart-container">
+                        <canvas id="expensePieChart"></canvas>
+                    </div>
+                </div>
+                <div class="chart-card">
+                    <h3>📊 粗利率推移</h3>
+                    <div class="chart-container">
+                        <canvas id="grossMarginChart"></canvas>
+                    </div>
+                </div>
+                <div class="chart-card">
+                    <h3>💰 営業利益推移</h3>
+                    <div class="chart-container">
+                        <canvas id="operatingProfitChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // グローバル変数
+        let currentData = null;
+        let charts = {};
+
+        // メッセージ表示ユーティリティ
+        const MessageUtils = {
+            showError(message) {
+                const errorDiv = document.getElementById('errorMessage');
+                errorDiv.textContent = message;
+                errorDiv.style.display = 'block';
+                setTimeout(() => {
+                    errorDiv.style.display = 'none';
+                }, 5000);
+            },
+
+            showSuccess(message) {
+                const successDiv = document.getElementById('successMessage');
+                successDiv.textContent = message;
+                successDiv.style.display = 'block';
+                setTimeout(() => {
+                    successDiv.style.display = 'none';
+                }, 3000);
+            }
+        };
+
+        // データ処理クラス
+        const DataProcessor = {
+            parseData(text) {
+                const lines = text.split('\n').filter(line => line.trim());
+                const data = [];
+                
+                for (const line of lines) {
+                    const patterns = [
+                        // 単月実績・累計実績・利益の形式
+                        /(\d{4}年?\s*\d{1,2}月?)[:：]\s*単月実績\s*([\d,]+)[円]?\s*[,、]\s*累計実績\s*([\d,]+)[円]?\s*[,、]\s*利益\s*([\d,]+)[円]?/,
+                        /(\d{4}年?\s*\d{1,2}月?)[:：]\s*単月実績\s*([\d,]+)\s*[,、]\s*累計実績\s*([\d,]+)\s*[,、]\s*利益\s*([\d,]+)/,
+                        // 従来の売上・利益・予算の形式
+                        /(\d{4}年?\s*\d{1,2}月?)[:：]\s*売上\s*([\d,]+)[円]?\s*[,、]\s*利益\s*([\d,]+)[円]?\s*[,、]\s*予算\s*([\d,]+)[円]?/,
+                        /(\d{4}年?\s*\d{1,2}月?)[:：]\s*売上\s*([\d,]+)\s*[,、]\s*利益\s*([\d,]+)\s*[,、]\s*予算\s*([\d,]+)/,
+                        // 予算なしの場合
+                        /(\d{4}年?\s*\d{1,2}月?)[:：]\s*売上\s*([\d,]+)[円]?\s*[,、]\s*利益\s*([\d,]+)[円]?/,
+                        /(\d{4}年?\s*\d{1,2}月?)[:：]\s*売上\s*([\d,]+)\s*[,、]\s*利益\s*([\d,]+)/
+                    ];
+                    
+                    let match = null;
+                    for (const pattern of patterns) {
+                        match = line.match(pattern);
+                        if (match) break;
+                    }
+                    
+                    if (match) {
+                        const month = match[1];
+                        let revenue, profit, budget = null;
+                        
+                        if (line.includes('単月実績') && line.includes('累計実績')) {
+                            revenue = parseInt(match[2].replace(/,/g, ''));
+                            profit = parseInt(match[4].replace(/,/g, ''));
+                        } else {
+                            revenue = parseInt(match[2].replace(/,/g, ''));
+                            profit = parseInt(match[3].replace(/,/g, ''));
+                            budget = match[4] ? parseInt(match[4].replace(/,/g, '')) : null;
+                        }
+                        
+                        const margin = (profit / revenue * 100).toFixed(1);
+                        const budgetAchievement = budget ? ((revenue / budget * 100).toFixed(1)) : null;
+                        
+                        data.push({
+                            month: month,
+                            revenue: revenue,
+                            profit: profit,
+                            budget: budget,
+                            margin: parseFloat(margin),
+                            budgetAchievement: budgetAchievement ? parseFloat(budgetAchievement) : null
+                        });
+                    }
+                }
+                
+                return data;
+            },
+
+            loadSampleData() {
+                const sampleData = `2025年1月: 売上 1,000,000円, 利益 200,000円, 予算 950,000円
+2025年2月: 売上 1,200,000円, 利益 250,000円, 予算 1,100,000円
+2025年3月: 売上 1,100,000円, 利益 220,000円, 予算 1,000,000円
+2025年4月: 売上 1,350,000円, 利益 280,000円, 予算 1,300,000円
+2025年5月: 売上 1,500,000円, 利益 320,000円, 予算 1,400,000円
+2025年6月: 売上 1,400,000円, 利益 300,000円, 予算 1,350,000円`;
+                
+                document.getElementById('dataInput').value = sampleData;
+                MessageUtils.showSuccess('サンプルデータを読み込みました！');
+            },
+
+            loadCSVData() {
+                const csvData = `2025年6月: 単月実績 274,890,000円, 累計実績 766,174,000円, 利益 50,000,000円
+2025年7月: 単月実績 300,000,000円, 累計実績 1,066,174,000円, 利益 60,000,000円
+2025年8月: 単月実績 350,000,000円, 累計実績 1,416,174,000円, 利益 70,000,000円
+2025年9月: 単月実績 400,000,000円, 累計実績 1,816,174,000円, 利益 80,000,000円
+2025年10月: 単月実績 450,000,000円, 累計実績 2,266,174,000円, 利益 90,000,000円`;
+                
+                document.getElementById('dataInput').value = csvData;
+                MessageUtils.showSuccess('CSVデータを読み込みました！（単月実績・累計実績）');
+            },
+
+            handleFileUpload(event) {
+                const file = event.target.files[0];
+                if (!file) return;
+                
+                const fileInfo = document.getElementById('fileInfo');
+                fileInfo.innerHTML = `📁 選択されたファイル: ${file.name} (${(file.size / 1024).toFixed(1)} KB)`;
+                
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    try {
+                        const content = e.target.result;
+                        const data = DataProcessor.parseData(content);
+                        
+                        if (data.length > 0) {
+                            MessageUtils.showSuccess(`CSVファイルを読み込みました！${data.length}件のデータを検出しました。`);
+                            setTimeout(() => {
+                                Dashboard.visualizeData(data);
+                            }, 500);
+                        } else {
+                            MessageUtils.showError('CSVファイルから有効なデータが見つかりませんでした。');
+                        }
+                    } catch (error) {
+                        MessageUtils.showError('CSVファイルの読み込み中にエラーが発生しました: ' + error.message);
+                    }
+                };
+                
+                reader.readAsText(file, 'UTF-8');
+            }
+        };
+
+        // ダッシュボード管理クラス
+        const Dashboard = {
+            processData() {
+                const text = document.getElementById('dataInput').value.trim();
+                
+                if (!text) {
+                    MessageUtils.showError('データを入力してください。');
+                    return;
+                }
+                
+                try {
+                    const data = DataProcessor.parseData(text);
+                    
+                    if (data.length === 0) {
+                        MessageUtils.showError('データが見つかりません。形式を確認してください。');
+                        return;
+                    }
+                    
+                    MessageUtils.showSuccess(`${data.length}ヶ月のデータを解析しました！`);
+                    this.visualizeData(data);
+                    
+                } catch (error) {
+                    MessageUtils.showError('データの解析中にエラーが発生しました: ' + error.message);
+                }
+            },
+
+            visualizeData(data) {
+                currentData = data;
+                
+                // サマリーカードの更新
+                this.updateSummaryCards(data);
+                
+                // アラートの検出
+                this.detectAnomalies(data);
+                
+                // チャートの作成
+                ChartManager.createAllCharts(data);
+                
+                // 表示
+                document.getElementById('summaryCards').style.display = 'grid';
+                document.getElementById('chartsContainer').style.display = 'grid';
+            },
+
+            updateSummaryCards(data) {
+                const totalRevenue = data.reduce((sum, item) => sum + item.revenue, 0);
+                const lastMonth = data[data.length - 1];
+                const lastMonthRevenue = lastMonth ? lastMonth.revenue : 0;
+                const lastMonthCumulative = data.length > 1 ? data.slice(0, -1).reduce((sum, item) => sum + item.revenue, 0) : 0;
+                
+                const avgGrossMargin = (data.reduce((sum, item) => sum + item.margin, 0) / data.length).toFixed(1);
+                
+                const totalOperatingProfit = data.reduce((sum, item) => {
+                    const expenses = item.expenses ? Object.values(item.expenses).reduce((expSum, exp) => expSum + exp, 0) : 0;
+                    return sum + (item.profit - expenses);
+                }, 0);
+                
+                const totalOperatingMargin = totalRevenue > 0 ? ((totalOperatingProfit / totalRevenue) * 100).toFixed(1) : 0;
+                
+                const lastMonthExpenses = lastMonth && lastMonth.expenses ? 
+                    Object.values(lastMonth.expenses).reduce((sum, exp) => sum + exp, 0) : 0;
+                const lastMonthOperatingProfit = lastMonth ? (lastMonth.profit - lastMonthExpenses) : 0;
+                const lastMonthOperatingMargin = lastMonthRevenue > 0 ? ((lastMonthOperatingProfit / lastMonthRevenue) * 100).toFixed(1) : 0;
+                
+                document.getElementById('totalRevenue').textContent = `¥${totalRevenue.toLocaleString()}`;
+                document.getElementById('lastMonthRevenue').textContent = `¥${lastMonthRevenue.toLocaleString()}`;
+                document.getElementById('lastMonthCumulative').textContent = `¥${lastMonthCumulative.toLocaleString()}`;
+                document.getElementById('avgGrossMargin').textContent = `${avgGrossMargin}%`;
+                document.getElementById('totalOperatingProfit').textContent = `¥${totalOperatingProfit.toLocaleString()}`;
+                document.getElementById('totalOperatingMargin').textContent = `${totalOperatingMargin}%`;
+                document.getElementById('lastMonthOperatingProfit').textContent = `¥${lastMonthOperatingProfit.toLocaleString()}`;
+                document.getElementById('lastMonthOperatingMargin').textContent = `${lastMonthOperatingMargin}%`;
+            },
+
+            detectAnomalies(data) {
+                const alerts = [];
+                
+                data.forEach(item => {
+                    if (item.budgetAchievement !== null) {
+                        if (item.budgetAchievement >= 150) {
+                            alerts.push({
+                                type: 'warning',
+                                title: `🚀 予算大幅超過: ${item.month}`,
+                                message: `予算達成率が${item.budgetAchievement}%と異常に高くなっています。`
+                            });
+                        } else if (item.budgetAchievement <= 50) {
+                            alerts.push({
+                                type: 'danger',
+                                title: `⚠️ 予算大幅未達: ${item.month}`,
+                                message: `予算達成率が${item.budgetAchievement}%と異常に低くなっています。`
+                            });
+                        }
+                    }
+                    
+                    if (item.margin < 0) {
+                        alerts.push({
+                            type: 'danger',
+                            title: `💸 赤字: ${item.month}`,
+                            message: `利益率が${item.margin}%とマイナスになっています。`
+                        });
+                    }
+                });
+                
+                this.displayAlerts(alerts);
+            },
+
+            displayAlerts(alerts) {
+                const alertSection = document.getElementById('alertSection');
+                const alertContainer = document.getElementById('alertContainer');
+                
+                if (alerts.length === 0) {
+                    alertSection.style.display = 'none';
+                    return;
+                }
+                
+                alertContainer.innerHTML = '';
+                alerts.forEach(alert => {
+                    const alertDiv = document.createElement('div');
+                    alertDiv.className = `alert-item ${alert.type}`;
+                    alertDiv.innerHTML = `
+                        <h4>${alert.title}</h4>
+                        <p>${alert.message}</p>
+                    `;
+                    alertContainer.appendChild(alertDiv);
+                });
+                
+                alertSection.style.display = 'block';
+            }
+        };
+
+        // チャート管理クラス
+        const ChartManager = {
+            createAllCharts(data) {
+                const months = data.map(item => item.month);
+                const revenues = data.map(item => item.revenue);
+                const margins = data.map(item => item.margin);
+                const budgets = data.map(item => item.budget || 0);
+                const achievements = data.map(item => item.budgetAchievement || 0);
+                
+                this.createRevenueChart(months, revenues);
+                this.createMarginChart(months, margins);
+                this.createBudgetChart(months, revenues, budgets);
+                this.createAchievementChart(months, achievements);
+                this.createExpenseCharts(data);
+                this.createGrossMarginChart(months, margins);
+                this.createOperatingProfitChart(data);
+            },
+
+            createRevenueChart(months, revenues) {
+                const ctx = document.getElementById('revenueChart').getContext('2d');
+                if (charts.revenue) charts.revenue.destroy();
+                
+                charts.revenue = new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: months,
+                        datasets: [{
+                            label: '売上 (円)',
+                            data: revenues,
+                            borderColor: '#4facfe',
+                            backgroundColor: 'rgba(79, 172, 254, 0.1)',
+                            borderWidth: 3,
+                            fill: true,
+                            tension: 0.4,
+                            pointBackgroundColor: '#4facfe',
+                            pointBorderColor: '#fff',
+                            pointBorderWidth: 2,
+                            pointRadius: 6
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: { legend: { display: false } },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                ticks: {
+                                    callback: function(value) {
+                                        return '¥' + value.toLocaleString();
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+            },
+
+            createMarginChart(months, margins) {
+                const ctx = document.getElementById('marginChart').getContext('2d');
+                if (charts.margin) charts.margin.destroy();
+                
+                charts.margin = new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: months,
+                        datasets: [{
+                            label: '利益率 (%)',
+                            data: margins,
+                            backgroundColor: 'rgba(102, 126, 234, 0.8)',
+                            borderColor: '#667eea',
+                            borderWidth: 2,
+                            borderRadius: 8,
+                            borderSkipped: false,
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: { legend: { display: false } },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                ticks: {
+                                    callback: function(value) {
+                                        return value + '%';
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+            },
+
+            createBudgetChart(months, revenues, budgets) {
+                const ctx = document.getElementById('budgetChart').getContext('2d');
+                if (charts.budget) charts.budget.destroy();
+                
+                charts.budget = new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: months,
+                        datasets: [{
+                            label: '売上 (円)',
+                            data: revenues,
+                            backgroundColor: 'rgba(79, 172, 254, 0.8)',
+                            borderColor: '#4facfe',
+                            borderWidth: 2,
+                            borderRadius: 8,
+                            borderSkipped: false,
+                        }, {
+                            label: '予算 (円)',
+                            data: budgets,
+                            backgroundColor: 'rgba(255, 193, 7, 0.8)',
+                            borderColor: '#ffc107',
+                            borderWidth: 2,
+                            borderRadius: 8,
+                            borderSkipped: false,
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: { legend: { display: true, position: 'top' } },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                ticks: {
+                                    callback: function(value) {
+                                        return '¥' + value.toLocaleString();
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+            },
+
+            createAchievementChart(months, achievements) {
+                const ctx = document.getElementById('achievementChart').getContext('2d');
+                if (charts.achievement) charts.achievement.destroy();
+                
+                charts.achievement = new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: months,
+                        datasets: [{
+                            label: '予算達成率 (%)',
+                            data: achievements,
+                            borderColor: '#28a745',
+                            backgroundColor: 'rgba(40, 167, 69, 0.1)',
+                            borderWidth: 3,
+                            fill: true,
+                            tension: 0.4,
+                            pointBackgroundColor: '#28a745',
+                            pointBorderColor: '#fff',
+                            pointBorderWidth: 2,
+                            pointRadius: 6
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: { legend: { display: false } },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                ticks: {
+                                    callback: function(value) {
+                                        return value + '%';
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+            },
+
+            createExpenseCharts(data) {
+                // サンプル経費データ
+                const months = data.map(item => item.month);
+                const sampleExpenses = {
+                    '人件費': [150000, 160000, 155000, 170000, 165000],
+                    '光熱費': [25000, 30000, 28000, 32000, 29000],
+                    '通信費': [15000, 18000, 16000, 20000, 17000],
+                    '交通費': [12000, 15000, 13000, 16000, 14000],
+                    'その他経費': [8000, 10000, 9000, 11000, 10000]
+                };
+                
+                // 経費推移チャート
+                const expenseCtx = document.getElementById('expenseChart').getContext('2d');
+                if (charts.expense) charts.expense.destroy();
+                
+                const colors = ['#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4', '#FFEAA7'];
+                const datasets = Object.keys(sampleExpenses).map((expenseName, index) => ({
+                    label: expenseName,
+                    data: sampleExpenses[expenseName],
+                    borderColor: colors[index],
+                    backgroundColor: colors[index] + '20',
+                    borderWidth: 2,
+                    fill: false,
+                    tension: 0.4
+                }));
+                
+                charts.expense = new Chart(expenseCtx, {
+                    type: 'line',
+                    data: { labels: months, datasets: datasets },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: { legend: { display: true, position: 'top' } },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                ticks: {
+                                    callback: function(value) {
+                                        return '¥' + value.toLocaleString();
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+                
+                // 経費構成比チャート
+                const pieCtx = document.getElementById('expensePieChart').getContext('2d');
+                if (charts.expensePie) charts.expensePie.destroy();
+                
+                const pieData = Object.keys(sampleExpenses).map(expenseName => ({
+                    label: expenseName,
+                    value: sampleExpenses[expenseName].reduce((sum, val) => sum + val, 0)
+                }));
+                
+                charts.expensePie = new Chart(pieCtx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: pieData.map(item => item.label),
+                        datasets: [{
+                            data: pieData.map(item => item.value),
+                            backgroundColor: colors,
+                            borderWidth: 2,
+                            borderColor: '#fff'
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: { legend: { display: true, position: 'bottom' } }
+                    }
+                });
+            },
+
+            createGrossMarginChart(months, margins) {
+                const ctx = document.getElementById('grossMarginChart').getContext('2d');
+                if (charts.grossMargin) charts.grossMargin.destroy();
+                
+                charts.grossMargin = new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: months,
+                        datasets: [{
+                            label: '粗利率 (%)',
+                            data: margins,
+                            borderColor: '#28a745',
+                            backgroundColor: 'rgba(40, 167, 69, 0.1)',
+                            borderWidth: 3,
+                            fill: true,
+                            tension: 0.4,
+                            pointBackgroundColor: '#28a745',
+                            pointBorderColor: '#fff',
+                            pointBorderWidth: 2,
+                            pointRadius: 6
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: { legend: { display: false } },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                ticks: {
+                                    callback: function(value) {
+                                        return value + '%';
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+            },
+
+            createOperatingProfitChart(data) {
+                const months = data.map(item => item.month);
+                const operatingProfits = data.map(item => {
+                    const expenses = item.expenses ? Object.values(item.expenses).reduce((sum, exp) => sum + exp, 0) : 0;
+                    return item.profit - expenses;
+                });
+                
+                const operatingMargins = data.map(item => {
+                    const expenses = item.expenses ? Object.values(item.expenses).reduce((sum, exp) => sum + exp, 0) : 0;
+                    const operatingProfit = item.profit - expenses;
+                    return item.revenue > 0 ? ((operatingProfit / item.revenue) * 100).toFixed(1) : 0;
+                });
+                
+                const ctx = document.getElementById('operatingProfitChart').getContext('2d');
+                if (charts.operatingProfit) charts.operatingProfit.destroy();
+                
+                charts.operatingProfit = new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: months,
+                        datasets: [{
+                            label: '営業利益 (円)',
+                            data: operatingProfits,
+                            backgroundColor: 'rgba(255, 193, 7, 0.8)',
+                            borderColor: '#ffc107',
+                            borderWidth: 2,
+                            borderRadius: 8,
+                            borderSkipped: false,
+                            yAxisID: 'y'
+                        }, {
+                            label: '営業利益率 (%)',
+                            data: operatingMargins,
+                            type: 'line',
+                            borderColor: '#dc3545',
+                            backgroundColor: 'rgba(220, 53, 69, 0.1)',
+                            borderWidth: 3,
+                            fill: false,
+                            tension: 0.4,
+                            pointBackgroundColor: '#dc3545',
+                            pointBorderColor: '#fff',
+                            pointBorderWidth: 2,
+                            pointRadius: 6,
+                            yAxisID: 'y1'
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: { legend: { display: true, position: 'top' } },
+                        scales: {
+                            y: {
+                                type: 'linear',
+                                display: true,
+                                position: 'left',
+                                ticks: {
+                                    callback: function(value) {
+                                        return '¥' + value.toLocaleString();
+                                    }
+                                }
+                            },
+                            y1: {
+                                type: 'linear',
+                                display: true,
+                                position: 'right',
+                                ticks: {
+                                    callback: function(value) {
+                                        return value + '%';
+                                    }
+                                },
+                                grid: { drawOnChartArea: false }
+                            }
+                        }
+                    }
+                });
+            }
+        };
+
+        // メール共有サービス
+        const EmailService = {
+            shareByEmail() {
+                if (!currentData || currentData.length === 0) {
+                    MessageUtils.showError('分析データがありません。まずデータを分析してください。');
+                    return;
+                }
+                
+                const emailContent = this.generateEmailContent(currentData);
+                const subject = encodeURIComponent('📊 経営分析レポート');
+                const body = encodeURIComponent(emailContent);
+                
+                const mailtoLink = `mailto:?subject=${subject}&body=${body}`;
+                window.open(mailtoLink);
+                
+                MessageUtils.showSuccess('メールクライアントが開きました！');
+            },
+
+            generateEmailContent(data) {
+                const totalRevenue = data.reduce((sum, item) => sum + item.revenue, 0);
+                const avgMargin = (data.reduce((sum, item) => sum + item.margin, 0) / data.length).toFixed(1);
+                
+                let content = `📊 経営分析レポート\n\n`;
+                content += `📅 分析期間: ${data[0].month} ～ ${data[data.length-1].month}\n`;
+                content += `📈 分析月数: ${data.length}ヶ月\n\n`;
+                
+                content += `💰 サマリー\n`;
+                content += `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n`;
+                content += `総売上: ¥${totalRevenue.toLocaleString()}\n`;
+                content += `平均利益率: ${avgMargin}%\n\n`;
+                
+                content += `📊 月別詳細データ\n`;
+                content += `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n`;
+                data.forEach(item => {
+                    content += `${item.month}:\n`;
+                    content += `  売上: ¥${item.revenue.toLocaleString()}\n`;
+                    content += `  利益: ¥${item.profit.toLocaleString()}\n`;
+                    content += `  利益率: ${item.margin}%\n`;
+                    if (item.budget) {
+                        content += `  予算: ¥${item.budget.toLocaleString()}\n`;
+                        content += `  予算達成率: ${item.budgetAchievement}%\n`;
+                    }
+                    content += `\n`;
+                });
+                
+                content += `📝 分析日時: ${new Date().toLocaleString('ja-JP')}\n`;
+                content += `📧 このレポートは経営分析ダッシュボードで自動生成されました。\n`;
+                
+                return content;
+            }
+        };
+    </script>
+</body>
+</html>

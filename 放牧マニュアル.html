@@ -1,0 +1,872 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>放牧マニュアル - デジタル版</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background-color: #f8f9fa;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            display: grid;
+            grid-template-columns: 300px 1fr;
+            gap: 30px;
+        }
+
+        .sidebar {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            height: fit-content;
+            position: sticky;
+            top: 20px;
+        }
+
+        .main-content {
+            background: white;
+            border-radius: 10px;
+            padding: 30px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        h1 {
+            color: #2c5530;
+            border-bottom: 3px solid #4CAF50;
+            padding-bottom: 10px;
+            margin-bottom: 30px;
+            font-size: 2.5em;
+        }
+
+        h2 {
+            color: #2c5530;
+            margin: 30px 0 20px 0;
+            padding: 15px 0;
+            border-bottom: 2px solid #e8f5e8;
+            font-size: 1.8em;
+        }
+
+        h3 {
+            color: #4CAF50;
+            margin: 25px 0 15px 0;
+            font-size: 1.4em;
+        }
+
+        h4 {
+            color: #666;
+            margin: 20px 0 10px 0;
+            font-size: 1.2em;
+        }
+
+        .toc {
+            list-style: none;
+        }
+
+        .toc li {
+            margin: 8px 0;
+        }
+
+        .toc a {
+            color: #4CAF50;
+            text-decoration: none;
+            padding: 8px 12px;
+            border-radius: 5px;
+            display: block;
+            transition: all 0.3s ease;
+        }
+
+        .toc a:hover {
+            background-color: #e8f5e8;
+            color: #2c5530;
+        }
+
+        .toc a.active {
+            background-color: #4CAF50;
+            color: white;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        th, td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        th {
+            background-color: #4CAF50;
+            color: white;
+            font-weight: 600;
+        }
+
+        tr:hover {
+            background-color: #f5f5f5;
+        }
+
+        .calculation-box {
+            background: #e8f5e8;
+            border-left: 4px solid #4CAF50;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 0 8px 8px 0;
+        }
+
+        .calculation-box code {
+            background: white;
+            padding: 10px;
+            border-radius: 5px;
+            display: block;
+            font-family: 'Courier New', monospace;
+            margin: 10px 0;
+        }
+
+        .checklist {
+            background: #f0f8ff;
+            border: 1px solid #4CAF50;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+
+        .checklist h4 {
+            color: #2c5530;
+            margin-bottom: 15px;
+        }
+
+        .checklist ul {
+            list-style: none;
+        }
+
+        .checklist li {
+            margin: 8px 0;
+            padding: 5px 0;
+        }
+
+        .checklist input[type="checkbox"] {
+            margin-right: 10px;
+            transform: scale(1.2);
+        }
+
+        .emergency-box {
+            background: #fff3cd;
+            border: 2px solid #ffc107;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+
+        .emergency-box h4 {
+            color: #856404;
+            margin-bottom: 15px;
+        }
+
+        .template-box {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+            font-family: 'Courier New', monospace;
+        }
+
+        .search-box {
+            margin-bottom: 20px;
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+
+        .highlight {
+            background-color: yellow;
+            padding: 2px 4px;
+            border-radius: 3px;
+        }
+
+        .section {
+            margin-bottom: 40px;
+        }
+
+        .back-to-top {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            cursor: pointer;
+            font-size: 18px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+            display: none;
+        }
+
+        .back-to-top:hover {
+            background: #45a049;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+            
+            .sidebar {
+                position: static;
+            }
+            
+            h1 {
+                font-size: 2em;
+            }
+            
+            h2 {
+                font-size: 1.5em;
+            }
+        }
+
+        .progress-bar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 0%;
+            height: 3px;
+            background: #4CAF50;
+            z-index: 1000;
+            transition: width 0.3s ease;
+        }
+    </style>
+</head>
+<body>
+    <div class="progress-bar" id="progressBar"></div>
+    
+    <div class="container">
+        <nav class="sidebar">
+            <div class="search-box">
+                <input type="text" id="searchInput" placeholder="マニュアル内を検索...">
+            </div>
+            
+            <h3>目次</h3>
+            <ul class="toc">
+                <li><a href="#基本概念">1. 放牧の基本概念</a></li>
+                <li><a href="#準備">2. 放牧前の準備</a></li>
+                <li><a href="#管理">3. 放牧地の管理</a></li>
+                <li><a href="#健康管理">4. 動物の健康管理</a></li>
+                <li><a href="#安全対策">5. 安全対策</a></li>
+                <li><a href="#装備">6. 必要な装備と道具</a></li>
+                <li><a href="#スマート技術">7. スマート放牧技術</a></li>
+                <li><a href="#水田放牧">8. 水田放牧の活用</a></li>
+                <li><a href="#リーン農業">9. リーン農業の原則</a></li>
+                <li><a href="#トラブル">10. トラブルシューティング</a></li>
+                <li><a href="#季節">11. 季節別の注意点</a></li>
+                <li><a href="#記録">12. 記録と評価</a></li>
+                <li><a href="#法規">13. 関連法規と規制</a></li>
+                <li><a href="#連絡先">14. 連絡先とリソース</a></li>
+            </ul>
+        </nav>
+
+        <main class="main-content">
+            <h1>放牧マニュアル</h1>
+
+            <section id="基本概念" class="section">
+                <h2>放牧の基本概念</h2>
+                
+                <h3>放牧とは</h3>
+                <p>放牧とは、家畜を自然の草地や牧草地で自由に草を食べさせる飼育方法です。動物の自然な行動を尊重し、健康的な成長を促進します。</p>
+                
+                <h3>放牧の利点</h3>
+                <ul>
+                    <li><strong>動物の健康</strong>: 自然な運動と新鮮な空気により、動物の健康状態が向上</li>
+                    <li><strong>コスト削減</strong>: 飼料代の削減</li>
+                    <li><strong>土壌改良</strong>: 動物の排泄物による自然な肥料効果</li>
+                    <li><strong>環境保護</strong>: 持続可能な農業の実践</li>
+                </ul>
+            </section>
+
+            <section id="準備" class="section">
+                <h2>放牧前の準備</h2>
+                
+                <h3>1. 放牧地の選定</h3>
+                
+                <h4>面積の基準</h4>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>動物の種類</th>
+                            <th>1頭あたりの必要面積</th>
+                            <th>備考</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>乳牛（成牛）</td>
+                            <td>0.5-1.0ha</td>
+                            <td>草の質により変動</td>
+                        </tr>
+                        <tr>
+                            <td>肉牛（成牛）</td>
+                            <td>0.3-0.7ha</td>
+                            <td>品種により変動</td>
+                        </tr>
+                        <tr>
+                            <td>子牛</td>
+                            <td>0.1-0.3ha</td>
+                            <td>月齢により調整</td>
+                        </tr>
+                        <tr>
+                            <td>羊</td>
+                            <td>0.05-0.1ha</td>
+                            <td>品種により変動</td>
+                        </tr>
+                        <tr>
+                            <td>山羊</td>
+                            <td>0.05-0.1ha</td>
+                            <td>品種により変動</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h4>地形の条件</h4>
+                <ul>
+                    <li><strong>傾斜角度</strong>: 15度以下が理想（最大30度まで）</li>
+                    <li><strong>標高差</strong>: 100m以内の標高差</li>
+                    <li><strong>排水性</strong>: 降雨後24時間以内に水が引くこと</li>
+                    <li><strong>土壌</strong>: pH 6.0-7.5の範囲</li>
+                </ul>
+
+                <h4>水場の要件</h4>
+                <ul>
+                    <li><strong>距離</strong>: 放牧地内の任意の地点から200m以内</li>
+                    <li><strong>水量</strong>: 成牛1頭あたり50-80L/日</li>
+                    <li><strong>水質</strong>: 大腸菌群数100個/mL以下</li>
+                    <li><strong>水温</strong>: 夏季25℃以下、冬季5℃以上</li>
+                </ul>
+
+                <h3>2. 柵の設置</h3>
+                
+                <h4>柵の仕様</h4>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>動物の種類</th>
+                            <th>柵の高さ</th>
+                            <th>支柱間隔</th>
+                            <th>電圧（電気柵）</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>乳牛</td>
+                            <td>1.2-1.5m</td>
+                            <td>3-4m</td>
+                            <td>3000-5000V</td>
+                        </tr>
+                        <tr>
+                            <td>肉牛</td>
+                            <td>1.0-1.2m</td>
+                            <td>3-4m</td>
+                            <td>3000-5000V</td>
+                        </tr>
+                        <tr>
+                            <td>子牛</td>
+                            <td>0.8-1.0m</td>
+                            <td>2-3m</td>
+                            <td>2000-3000V</td>
+                        </tr>
+                        <tr>
+                            <td>羊</td>
+                            <td>0.9-1.1m</td>
+                            <td>2-3m</td>
+                            <td>4000-6000V</td>
+                        </tr>
+                        <tr>
+                            <td>山羊</td>
+                            <td>1.0-1.2m</td>
+                            <td>2-3m</td>
+                            <td>4000-6000V</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </section>
+
+            <section id="管理" class="section">
+                <h2>放牧地の管理</h2>
+                
+                <h3>草の管理</h3>
+                
+                <h4>草の高さ管理</h4>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>草の種類</th>
+                            <th>放牧開始高さ</th>
+                            <th>放牧終了高さ</th>
+                            <th>再生期間</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>イタリアンライグラス</td>
+                            <td>15-20cm</td>
+                            <td>5-8cm</td>
+                            <td>3-4週間</td>
+                        </tr>
+                        <tr>
+                            <td>オーチャードグラス</td>
+                            <td>20-25cm</td>
+                            <td>6-10cm</td>
+                            <td>4-5週間</td>
+                        </tr>
+                        <tr>
+                            <td>チモシー</td>
+                            <td>25-30cm</td>
+                            <td>8-12cm</td>
+                            <td>5-6週間</td>
+                        </tr>
+                        <tr>
+                            <td>クローバー</td>
+                            <td>15-20cm</td>
+                            <td>5-8cm</td>
+                            <td>3-4週間</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h4>放牧圧の計算</h4>
+                <div class="calculation-box">
+                    <strong>計算式:</strong>
+                    <code>放牧圧 = 動物の体重(kg) × 頭数 ÷ 放牧地の面積(ha)</code>
+                    <ul>
+                        <li><strong>適正放牧圧</strong>: 200-400kg/ha</li>
+                        <li><strong>過放牧の目安</strong>: 500kg/ha以上</li>
+                        <li><strong>軽放牧の目安</strong>: 150kg/ha以下</li>
+                    </ul>
+                </div>
+
+                <h4>ローテーション計画</h4>
+                <div class="calculation-box">
+                    <strong>計算式:</strong>
+                    <code>区画数 = 再生期間(週) ÷ 放牧期間(週) + 1</code>
+                    <p><strong>例</strong>：再生期間4週間、放牧期間1週間の場合<br>
+                    → 区画数 = 4 ÷ 1 + 1 = 5区画</p>
+                </div>
+
+                <h3>水の管理</h3>
+                
+                <h4>必要水量の計算</h4>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>動物の種類</th>
+                            <th>体重</th>
+                            <th>必要水量(L/日)</th>
+                            <th>気温による増加率</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>乳牛</td>
+                            <td>500kg</td>
+                            <td>50-80</td>
+                            <td>夏季+30%</td>
+                        </tr>
+                        <tr>
+                            <td>肉牛</td>
+                            <td>400kg</td>
+                            <td>40-60</td>
+                            <td>夏季+25%</td>
+                        </tr>
+                        <tr>
+                            <td>子牛</td>
+                            <td>200kg</td>
+                            <td>20-30</td>
+                            <td>夏季+20%</td>
+                        </tr>
+                        <tr>
+                            <td>羊</td>
+                            <td>50kg</td>
+                            <td>5-8</td>
+                            <td>夏季+15%</td>
+                        </tr>
+                        <tr>
+                            <td>山羊</td>
+                            <td>40kg</td>
+                            <td>4-6</td>
+                            <td>夏季+15%</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </section>
+
+            <section id="健康管理" class="section">
+                <h2>動物の健康管理</h2>
+                
+                <h3>日常の観察</h3>
+                
+                <h4>健康チェックリスト</h4>
+                <div class="checklist">
+                    <h4>毎日のチェック項目</h4>
+                    <ul>
+                        <li><input type="checkbox"> 群れから離れていないか</li>
+                        <li><input type="checkbox"> 正常な歩行をしているか</li>
+                        <li><input type="checkbox"> 食欲は正常か</li>
+                        <li><input type="checkbox"> 水を飲んでいるか</li>
+                        <li><input type="checkbox"> 排泄物に異常がないか</li>
+                        <li><input type="checkbox"> 外傷や腫れがないか</li>
+                        <li><input type="checkbox"> 目や鼻の分泌物に異常がないか</li>
+                    </ul>
+                </div>
+
+                <h4>異常行動のサイン</h4>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>症状</th>
+                            <th>考えられる原因</th>
+                            <th>対処法</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>群れから離れる</td>
+                            <td>病気、けが、出産</td>
+                            <td>個別観察、獣医師連絡</td>
+                        </tr>
+                        <tr>
+                            <td>歩行困難</td>
+                            <td>足のけが、関節炎</td>
+                            <td>移動制限、治療</td>
+                        </tr>
+                        <tr>
+                            <td>食欲不振</td>
+                            <td>消化器疾患、ストレス</td>
+                            <td>飼料変更、環境改善</td>
+                        </tr>
+                        <tr>
+                            <td>下痢</td>
+                            <td>感染症、飼料問題</td>
+                            <td>隔離、獣医師診察</td>
+                        </tr>
+                        <tr>
+                            <td>呼吸困難</td>
+                            <td>呼吸器疾患、熱中症</td>
+                            <td>緊急治療、獣医師連絡</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h3>定期検査</h3>
+                
+                <h4>検査スケジュール</h4>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>検査項目</th>
+                            <th>頻度</th>
+                            <th>基準値</th>
+                            <th>備考</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>体重測定</td>
+                            <td>月1回</td>
+                            <td>前月比±5%以内</td>
+                            <td>急激な変化に注意</td>
+                        </tr>
+                        <tr>
+                            <td>体温測定</td>
+                            <td>週1回</td>
+                            <td>38.0-39.5℃</td>
+                            <td>発熱時は毎日測定</td>
+                        </tr>
+                        <tr>
+                            <td>血液検査</td>
+                            <td>年2回</td>
+                            <td>獣医師の判断</td>
+                            <td>健康診断時</td>
+                        </tr>
+                        <tr>
+                            <td>寄生虫検査</td>
+                            <td>年4回</td>
+                            <td>陰性</td>
+                            <td>季節の変わり目</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h4>体重測定の方法</h4>
+                <div class="calculation-box">
+                    <strong>計算式:</strong>
+                    <code>体重(kg) = 胸囲(cm)² × 体長(cm) ÷ 10800</code>
+                    <ul>
+                        <li><strong>胸囲</strong>: 肩甲骨の後ろで測定</li>
+                        <li><strong>体長</strong>: 肩から尻までの長さ</li>
+                        <li><strong>測定時間</strong>: 毎回同じ時間帯</li>
+                    </ul>
+                </div>
+            </section>
+
+            <section id="安全対策" class="section">
+                <h2>安全対策</h2>
+                
+                <h3>応急処置</h3>
+                
+                <div class="emergency-box">
+                    <h4>軽度の外傷（擦り傷、切り傷）</h4>
+                    <ol>
+                        <li>傷口を清潔な水で洗浄</li>
+                        <li>異物を除去</li>
+                        <li>消毒薬を塗布</li>
+                        <li>必要に応じて包帯を巻く</li>
+                        <li>獣医師に連絡</li>
+                    </ol>
+                </div>
+
+                <div class="emergency-box">
+                    <h4>重度の外傷（深い切り傷、骨折）</h4>
+                    <ol>
+                        <li>動物を安静にさせる</li>
+                        <li>出血があれば圧迫止血</li>
+                        <li>即座に獣医師に連絡</li>
+                        <li>動物の移動は最小限に</li>
+                    </ol>
+                </div>
+
+                <div class="emergency-box">
+                    <h4>植物中毒の疑いがある場合</h4>
+                    <ol>
+                        <li>中毒の原因植物を特定</li>
+                        <li>動物を中毒源から遠ざける</li>
+                        <li>獣医師に即座に連絡</li>
+                        <li>可能であれば中毒植物を持参</li>
+                    </ol>
+                </div>
+            </section>
+
+            <section id="記録" class="section">
+                <h2>記録と評価</h2>
+                
+                <h3>放牧日誌の記録項目</h3>
+                
+                <h4>記録用テンプレート</h4>
+                <div class="template-box">
+日付: ____年__月__日
+天候: 晴/曇/雨/雪
+気温: __℃
+放牧時間: __:__ - __:__
+放牧地: 区画___
+動物数: __頭
+健康状態: 正常/異常（詳細: ________）
+草の高さ: __cm
+草の品質: 良/普通/悪
+水の状態: 十分/不足
+特記事項: ________________
+                </div>
+
+                <h3>定期評価</h3>
+                
+                <h4>月次評価項目</h4>
+                <div class="checklist">
+                    <ul>
+                        <li><input type="checkbox"> 動物の健康状態</li>
+                        <li><input type="checkbox"> 体重の変化</li>
+                        <li><input type="checkbox"> 草の成長状況</li>
+                        <li><input type="checkbox"> 放牧地の状態</li>
+                        <li><input type="checkbox"> 水の供給状況</li>
+                        <li><input type="checkbox"> 設備の点検結果</li>
+                        <li><input type="checkbox"> 問題点と改善策</li>
+                    </ul>
+                </div>
+            </section>
+
+            <section id="連絡先" class="section">
+                <h2>連絡先とリソース</h2>
+                
+                <h3>緊急連絡先</h3>
+                <ul>
+                    <li><strong>獣医師</strong>: [電話番号を記入]</li>
+                    <li><strong>緊急時獣医師</strong>: [電話番号を記入]</li>
+                    <li><strong>動物病院</strong>: [電話番号を記入]</li>
+                    <li><strong>畜産技術センター</strong>: [電話番号を記入]</li>
+                </ul>
+
+                <h3>参考資料</h3>
+                <ul>
+                    <li>畜産技術指針</li>
+                    <li>動物愛護管理法</li>
+                    <li>地域の放牧ガイドライン</li>
+                    <li>農研機構「スマート放牧導入マニュアル」</li>
+                    <li>農研機構「水田放牧の手引き」</li>
+                    <li>周年親子放牧導入標準作業手順書</li>
+                </ul>
+            </section>
+        </main>
+    </div>
+
+    <button class="back-to-top" id="backToTop">↑</button>
+
+    <script>
+        // 検索機能
+        const searchInput = document.getElementById('searchInput');
+        const sections = document.querySelectorAll('.section');
+
+        searchInput.addEventListener('input', function() {
+            const searchTerm = this.value.toLowerCase();
+            
+            sections.forEach(section => {
+                const text = section.textContent.toLowerCase();
+                if (text.includes(searchTerm)) {
+                    section.style.display = 'block';
+                    if (searchTerm) {
+                        highlightText(section, searchTerm);
+                    } else {
+                        removeHighlights(section);
+                    }
+                } else {
+                    section.style.display = searchTerm ? 'none' : 'block';
+                }
+            });
+        });
+
+        function highlightText(element, term) {
+            removeHighlights(element);
+            const walker = document.createTreeWalker(
+                element,
+                NodeFilter.SHOW_TEXT,
+                null,
+                false
+            );
+
+            const textNodes = [];
+            let node;
+            while (node = walker.nextNode()) {
+                textNodes.push(node);
+            }
+
+            textNodes.forEach(textNode => {
+                const text = textNode.textContent;
+                const regex = new RegExp(`(${term})`, 'gi');
+                if (regex.test(text)) {
+                    const highlightedText = text.replace(regex, '<span class="highlight">$1</span>');
+                    const wrapper = document.createElement('div');
+                    wrapper.innerHTML = highlightedText;
+                    textNode.parentNode.replaceChild(wrapper, textNode);
+                }
+            });
+        }
+
+        function removeHighlights(element) {
+            const highlights = element.querySelectorAll('.highlight');
+            highlights.forEach(highlight => {
+                highlight.outerHTML = highlight.innerHTML;
+            });
+        }
+
+        // 目次ナビゲーション
+        const tocLinks = document.querySelectorAll('.toc a');
+        const sectionsWithIds = document.querySelectorAll('section[id]');
+
+        // スクロール時のアクティブセクション更新
+        window.addEventListener('scroll', function() {
+            let current = '';
+            sectionsWithIds.forEach(section => {
+                const sectionTop = section.offsetTop;
+                const sectionHeight = section.clientHeight;
+                if (scrollY >= (sectionTop - 200)) {
+                    current = section.getAttribute('id');
+                }
+            });
+
+            tocLinks.forEach(link => {
+                link.classList.remove('active');
+                if (link.getAttribute('href') === '#' + current) {
+                    link.classList.add('active');
+                }
+            });
+
+            // プログレスバー更新
+            const winScroll = document.body.scrollTop || document.documentElement.scrollTop;
+            const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+            const scrolled = (winScroll / height) * 100;
+            document.getElementById('progressBar').style.width = scrolled + '%';
+        });
+
+        // スムーススクロール
+        tocLinks.forEach(link => {
+            link.addEventListener('click', function(e) {
+                e.preventDefault();
+                const targetId = this.getAttribute('href').substring(1);
+                const targetSection = document.getElementById(targetId);
+                if (targetSection) {
+                    targetSection.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        // トップに戻るボタン
+        const backToTopBtn = document.getElementById('backToTop');
+
+        window.addEventListener('scroll', function() {
+            if (window.pageYOffset > 300) {
+                backToTopBtn.style.display = 'block';
+            } else {
+                backToTopBtn.style.display = 'none';
+            }
+        });
+
+        backToTopBtn.addEventListener('click', function() {
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+        });
+
+        // チェックボックスの状態保存
+        const checkboxes = document.querySelectorAll('input[type="checkbox"]');
+        checkboxes.forEach(checkbox => {
+            // ローカルストレージから状態を復元
+            const savedState = localStorage.getItem(checkbox.id || checkbox.parentElement.textContent.trim());
+            if (savedState === 'true') {
+                checkbox.checked = true;
+            }
+
+            // 状態変更を保存
+            checkbox.addEventListener('change', function() {
+                localStorage.setItem(this.id || this.parentElement.textContent.trim(), this.checked);
+            });
+        });
+    </script>
+</body>
+</html>
